@@ -34,6 +34,13 @@ func init() {
 	purego.RegisterLibFunc(&CanvasDrawAllPixels, libchafa, "chafa_canvas_draw_all_pixels")
 	purego.RegisterLibFunc(&CanvasPrint, libchafa, "chafa_canvas_print")
 	purego.RegisterLibFunc(&CanvasPrintRows, libchafa, "chafa_canvas_print_rows")
+	purego.RegisterLibFunc(&CanvasPrintRowsStrv, libchafa, "chafa_canvas_print_rows_strv")
+	purego.RegisterLibFunc(&CanvasGetCharAt, libchafa, "chafa_canvas_get_char_at")
+	purego.RegisterLibFunc(&CanvasSetCharAt, libchafa, "chafa_canvas_set_char_at")
+	purego.RegisterLibFunc(&CanvasGetColorsAt, libchafa, "chafa_canvas_get_colors_at")
+	purego.RegisterLibFunc(&CanvasSetColorsAt, libchafa, "chafa_canvas_set_colors_at")
+	purego.RegisterLibFunc(&CanvasGetRawColorsAt, libchafa, "chafa_canvas_get_raw_colors_at")
+	purego.RegisterLibFunc(&CanvasSetRawColorsAt, libchafa, "chafa_canvas_set_raw_colors_at")
 
 	// SymbolMap
 	purego.RegisterLibFunc(&SymbolMapNew, libchafa, "chafa_symbol_map_new")

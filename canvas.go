@@ -3,21 +3,125 @@ package chafa
 import "unsafe"
 
 var (
-	CanvasNew           func(config *CanvasConfig) *Canvas
-	CanvasNewSimilar    func(orig *Canvas) *Canvas
-	CanvasRef           func(canvas *Canvas)
-	CanvasUnRef         func(canvas *Canvas)
-	CanvasPeekConfig    func(canvas *Canvas) *CanvasConfig
-	CanvasSetPlacement  func(canvas *Canvas, placement *Placement)
-	CanvasDrawAllPixels func(canvas *Canvas,
-		src_pixel_type PixelType,
-		src_pixels []uint8,
-		src_width int32,
-		src_height int32,
-		src_rowstride int32,
+	// Creates a new canvas with the specified configuration. The canvas makes
+	// a private copy of the configuration, so it will not be affected by subsequent changes.
+	CanvasNew func(config *CanvasConfig) *Canvas
+
+	// Creates a new canvas configured similarly to orig.
+	CanvasNewSimilar func(orig *Canvas) *Canvas
+
+	// Adds a reference to canvas.
+	CanvasRef func(canvas *Canvas)
+
+	// Removes a reference from canvas. When remaining references drops to zero,
+	// the canvas is freed and can no longer be used.
+	CanvasUnRef func(canvas *Canvas)
+
+	// Returns a pointer to the configuration belonging to canvas.
+	// This can be inspected using the [CanvasConfig] getter functions, but not changed.
+	CanvasPeekConfig func(canvas *Canvas) *CanvasConfig
+
+	// Places placement on canvas, replacing the latter's content. The placement will cover the entire canvas.
+	//
+	// The canvas will keep a reference to the placement until it is replaced or the canvas itself is freed.
+	CanvasSetPlacement func(canvas *Canvas, placement *Placement)
+
+	// Replaces pixel data of canvas with a copy of that found at src_pixels ,
+	// which must be in one of the formats supported by [PixelType].
+	CanvasDrawAllPixels func(
+		canvas *Canvas,
+		srcPixelType PixelType,
+		srcPixels []uint8,
+		srcWidth int32,
+		srcHeight int32,
+		srcRowstride int32,
 	)
-	CanvasPrint     func(canvas *Canvas, term_info *TermInfo) *GString
-	CanvasPrintRows func(canvas *Canvas, term_info *TermInfo, array_out *[]string, array_len_out *int32) // TODO:
+
+	// Builds a UTF-8 string of terminal control sequences and symbols representing the canvas' current contents.
+	// This can be printed to a terminal. The exact choice of escape sequences and symbols, dimensions, etc.
+	// is determined by the configuration assigned to canvas on its creation.
+	//
+	// All output lines except for the last one will end in a newline.
+	CanvasPrint func(canvas *Canvas, termInfo *TermInfo) *GString
+
+	//Builds an array of UTF-8 strings made up of terminal control sequences and symbols
+	// representing the canvas' current contents. These can be printed to a terminal.
+	// The exact choice of escape sequences and symbols, dimensions, etc. is determined
+	// by the configuration assigned to canvas on its creation.
+	//
+	// The array will be NULL-terminated. The element count does not include the terminator.
+	//
+	// When the canvas' pixel mode is [CHAFA_PIXEL_MODE_SYMBOLS], each element will hold
+	// the contents of exactly one symbol row. There will be no row separators,
+	// newlines or control sequences to reposition the cursor between rows.
+	// Row positioning is left to the caller.
+	//
+	// In other pixel modes, there may be one or more strings, but the splitting
+	// criteria should not be relied on. They must be printed in sequence, exactly as they appear.
+	CanvasPrintRows func(canvas *Canvas, termInfo *TermInfo, arrayOut *unsafe.Pointer, lenOut *int32)
+
+	// Builds an array of UTF-8 strings made up of terminal control sequences and symbols
+	// representing the canvas' current contents. These can be printed to a terminal.
+	// The exact choice of escape sequences and symbols, dimensions, etc. is determined by
+	// the configuration assigned to canvas on its creation.
+	//
+	// When the canvas' pixel mode is [CHAFA_PIXEL_MODE_SYMBOLS], each element
+	// will hold the contents of exactly one symbol row. There will be no row separators,
+	// newlines or control sequences to reposition the cursor between rows.
+	// Row positioning is left to the caller.
+	//
+	// In other pixel modes, there may be one or more strings,
+	// but the splitting criteria should not be relied on.
+	// They must be printed in sequence, exactly as they appear.
+	CanvasPrintRowsStrv func(canvas *Canvas, termInfo *TermInfo) unsafe.Pointer
+
+	// Returns the character at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, the leftmost cell will contain the character
+	// and the rightmost cell will contain 0.
+	CanvasGetCharAt func(canvas *Canvas, x, y int32) rune
+
+	// Sets the character at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, the leftmost cell must contain the character
+	// and the cell to the right of it will automatically be set to 0.
+	//
+	// If the character is a nonprintable or zero-width, no change will be made.
+	CanvasSetCharAt func(canvas *Canvas, x, y int32, c rune) int32
+
+	// Gets the colors at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, both cells will contain the same colors.
+	//
+	// The colors will be -1 for transparency, packed 8bpc RGB otherwise, i.e. 0x00RRGGBB hex.
+	//
+	// If the canvas is in an indexed mode, palette lookups will be made for you.
+	CanvasGetColorsAt func(canvas *Canvas, x, y int32, fgOut, bgOut *int32)
+
+	// Sets the colors at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, both cells will be set to the same color.
+	//
+	// The colors must be -1 for transparency, packed 8bpc RGB otherwise, i.e. 0x00RRGGBB hex.
+	//
+	// If the canvas is in an indexed mode, palette lookups will be made for you.
+	CanvasSetColorsAt func(canvas *Canvas, x, y, fg, bg int32)
+
+	// Gets the colors at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, both cells will contain the same colors.
+	//
+	// The colors will be -1 for transparency, packed 8bpc RGB, i.e. 0x00RRGGBB hex
+	// in truecolor mode, or the raw pen value (0-255) in indexed modes.
+	//
+	// It's the caller's responsibility to handle the color values correctly
+	// according to the canvas mode (truecolor or indexed).
+	CanvasGetRawColorsAt func(canvas *Canvas, x, y int32, fgOut, bgOut *int32)
+
+	// Sets the colors at cell (x, y). The coordinates are zero-indexed.
+	// For double-width characters, both cells will be set to the same color.
+	//
+	// The colors must be -1 for transparency, packed 8bpc RGB, i.e. 0x00RRGGBB hex
+	// in truecolor mode, or the raw pen value (0-255) in indexed modes.
+	//
+	// It's the caller's responsibility to handle the color values correctly
+	// according to the canvas mode (truecolor or indexed).
+	CanvasSetRawColorsAt func(canvas *Canvas, x, y, fg, bg int32)
 )
 
 type Canvas struct {
