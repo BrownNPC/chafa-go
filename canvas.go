@@ -211,8 +211,9 @@ const (
 	CHAFA_DITHER_MODE_NONE      DitherMode = 0
 	CHAFA_DITHER_MODE_ORDERED   DitherMode = 1
 	CHAFA_DITHER_MODE_DIFFUSION DitherMode = 2
-	CHAFA_DITHER_MODE_NOISE     DitherMode = 3
-	CHAFA_DITHER_MODE_MAX       DitherMode = 4
+	CHAFA_DITHER_MODE_MAX       DitherMode = 3
+
+	// CHAFA_DITHER_MODE_NOISE     DitherMode = 3
 )
 
 type Placement struct {
