@@ -216,15 +216,6 @@ const (
 	// CHAFA_DITHER_MODE_NOISE     DitherMode = 3
 )
 
-type Placement struct {
-	Refs int32
-
-	Image          *Image
-	Id             int32
-	Halign, Valign Align
-	Tuck           Tuck
-}
-
 type Image struct {
 	Refs  int32
 	Frame *Frame
@@ -261,24 +252,6 @@ const (
 	CHAFA_PIXEL_BGR8 PixelType = 9
 
 	CHAFA_PIXEL_MAX PixelType = 10
-)
-
-type Align int32
-
-const (
-	CHAFA_ALIGN_START  Align = 0
-	CHAFA_ALIGN_END    Align = 1
-	CHAFA_ALIGN_CENTER Align = 2
-	CHAFA_ALIGN_MAX    Align = 3
-)
-
-type Tuck int32
-
-const (
-	CHAFA_TUCK_STRETCH       Tuck = 0
-	CHAFA_TUCK_FIT           Tuck = 1
-	CHAFA_TUCK_SHRINK_TO_FIT Tuck = 2
-	CHAFA_TUCK_MAX           Tuck = 3
 )
 
 const CHAFA_PALETTE_INDEX_MAX = 259

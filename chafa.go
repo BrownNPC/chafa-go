@@ -230,6 +230,17 @@ func init() {
 		"chafa_canvas_config_set_passthrough",
 	)
 
+	// Placement
+	purego.RegisterLibFunc(&PlacementNew, libchafa, "chafa_placement_new")
+	purego.RegisterLibFunc(&PlacementRef, libchafa, "chafa_placement_ref")
+	purego.RegisterLibFunc(&PlacementUnref, libchafa, "chafa_placement_unref")
+	purego.RegisterLibFunc(&PlacementGetTuck, libchafa, "chafa_placement_get_tuck")
+	purego.RegisterLibFunc(&PlacementSetTuck, libchafa, "chafa_placement_set_tuck")
+	purego.RegisterLibFunc(&PlacementGetHAlign, libchafa, "chafa_placement_get_halign")
+	purego.RegisterLibFunc(&PlacementSetHAlign, libchafa, "chafa_placement_set_halign")
+	purego.RegisterLibFunc(&PlacementGetVAlign, libchafa, "chafa_placement_get_valign")
+	purego.RegisterLibFunc(&PlacementSetVAlign, libchafa, "chafa_placement_set_valign")
+
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")
 	purego.RegisterLibFunc(&GetNActualThreads, libchafa, "chafa_get_n_actual_threads")
