@@ -241,6 +241,12 @@ func init() {
 	purego.RegisterLibFunc(&PlacementGetVAlign, libchafa, "chafa_placement_get_valign")
 	purego.RegisterLibFunc(&PlacementSetVAlign, libchafa, "chafa_placement_set_valign")
 
+	// Image
+	purego.RegisterLibFunc(&ImageNew, libchafa, "chafa_image_new")
+	purego.RegisterLibFunc(&ImageRef, libchafa, "chafa_image_ref")
+	purego.RegisterLibFunc(&ImageUnref, libchafa, "chafa_image_unref")
+	purego.RegisterLibFunc(&ImageSetFrame, libchafa, "chafa_image_set_frame")
+
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")
 	purego.RegisterLibFunc(&GetNActualThreads, libchafa, "chafa_get_n_actual_threads")

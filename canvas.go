@@ -216,11 +216,6 @@ const (
 	// CHAFA_DITHER_MODE_NOISE     DitherMode = 3
 )
 
-type Image struct {
-	Refs  int32
-	Frame *Frame
-}
-
 type Frame struct {
 	Refs                     int32
 	PixelType                PixelType
