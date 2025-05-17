@@ -247,6 +247,13 @@ func init() {
 	purego.RegisterLibFunc(&ImageUnref, libchafa, "chafa_image_unref")
 	purego.RegisterLibFunc(&ImageSetFrame, libchafa, "chafa_image_set_frame")
 
+	// Frame
+	purego.RegisterLibFunc(&FrameNew, libchafa, "chafa_frame_new")
+	purego.RegisterLibFunc(&FrameNewBorrow, libchafa, "chafa_frame_new_borrow")
+	purego.RegisterLibFunc(&FrameNewSteal, libchafa, "chafa_frame_new_steal")
+	purego.RegisterLibFunc(&FrameRef, libchafa, "chafa_frame_ref")
+	purego.RegisterLibFunc(&FrameUnref, libchafa, "chafa_frame_unref")
+
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")
 	purego.RegisterLibFunc(&GetNActualThreads, libchafa, "chafa_get_n_actual_threads")

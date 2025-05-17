@@ -216,16 +216,6 @@ const (
 	// CHAFA_DITHER_MODE_NOISE     DitherMode = 3
 )
 
-type Frame struct {
-	Refs                     int32
-	PixelType                PixelType
-	Width, Height, Rowstride int32
-
-	Data unsafe.Pointer
-
-	DataIsOwned bool
-}
-
 type PixelType int32
 
 const (
