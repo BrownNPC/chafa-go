@@ -2,6 +2,13 @@ package chafa
 
 import (
 	"fmt"
+	"image"
+	"image/draw"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
+	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/ebitengine/purego"
@@ -295,4 +302,46 @@ type GString struct {
 
 func (gstr *GString) String() string {
 	return gstr.str
+}
+
+func Load(path string) (pixels []uint8, width, height int32, err error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	defer file.Close()
+
+	var img image.Image
+
+	switch filepath.Ext(path) {
+	case "png":
+		img, err = png.Decode(file)
+		if err != nil {
+			return nil, 0, 0, err
+		}
+	case "jpg", "jpeg":
+		img, err = jpeg.Decode(file)
+		if err != nil {
+			return nil, 0, 0, err
+		}
+	case "gif":
+		img, err = gif.Decode(file)
+		if err != nil {
+			return nil, 0, 0, err
+		}
+	default:
+		img, _, err = image.Decode(file)
+		if err != nil {
+			return nil, 0, 0, err
+		}
+	}
+
+	bounds := img.Bounds()
+	width = int32(bounds.Dx())
+	height = int32(bounds.Dy())
+
+	rgbaImg := image.NewRGBA(bounds)
+	draw.Draw(rgbaImg, bounds, img, bounds.Min, draw.Src)
+
+	return rgbaImg.Pix, width, height, nil
 }
