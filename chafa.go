@@ -272,6 +272,15 @@ func init() {
 	purego.RegisterLibFunc(&SymbolMapGetGlyph, libchafa, "chafa_symbol_map_get_glyph")
 	purego.RegisterLibFunc(&SymbolMapAddGlyph, libchafa, "chafa_symbol_map_add_glyph")
 
+	// TermDb
+	purego.RegisterLibFunc(&TermDbNew, libchafa, "chafa_term_db_new")
+	purego.RegisterLibFunc(&TermDbCopy, libchafa, "chafa_term_db_copy")
+	purego.RegisterLibFunc(&TermDbRef, libchafa, "chafa_term_db_ref")
+	purego.RegisterLibFunc(&TermDbUnref, libchafa, "chafa_term_db_unref")
+	purego.RegisterLibFunc(&TermDbGetDefault, libchafa, "chafa_term_db_get_default")
+	purego.RegisterLibFunc(&TermDbDetect, libchafa, "chafa_term_db_detect")
+	purego.RegisterLibFunc(&TermDbGetFallbackInfo, libchafa, "chafa_term_db_get_fallback_info")
+
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")
 	purego.RegisterLibFunc(&GetNActualThreads, libchafa, "chafa_get_n_actual_threads")
