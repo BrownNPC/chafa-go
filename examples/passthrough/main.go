@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	FONT_WIDTH  = 11
-	FONT_HEIGHT = 24
+	FONT_WIDTH  = 18
+	FONT_HEIGHT = 46
 	N_CHANNELS  = 4
 )
 
@@ -23,8 +23,10 @@ func main() {
 	config := chafa.CanvasConfigNew()
 	defer chafa.CanvasConfigUnref(config)
 
-	chafa.CanvasConfigSetGeometry(config, 30, 30)
+	chafa.CanvasConfigSetGeometry(config, 40, 15)
 	chafa.CanvasConfigSetCellGeometry(config, FONT_WIDTH, FONT_HEIGHT)
+	chafa.CanvasConfigSetPixelMode(config, chafa.CHAFA_PIXEL_MODE_KITTY)
+	chafa.CanvasConfigSetPassthrough(config, chafa.CHAFA_PASSTHROUGH_TMUX)
 
 	widthNew := config.Width
 	heightNew := config.Height
@@ -40,16 +42,19 @@ func main() {
 	canvas := chafa.CanvasNew(config)
 	defer chafa.CanvasUnRef(canvas)
 
-	chafa.CanvasDrawAllPixels(
-		canvas,
-		chafa.CHAFA_PIXEL_RGBA8_UNASSOCIATED,
+	frame := chafa.FrameNew(
 		pixels,
-		int32(width),
-		int32(height),
-		int32(width)*N_CHANNELS,
+		chafa.CHAFA_PIXEL_RGBA8_UNASSOCIATED,
+		width,
+		height,
+		width*N_CHANNELS,
 	)
 
-	gs := chafa.CanvasPrint(canvas, nil)
+	img := chafa.ImageNew()
+	chafa.ImageSetFrame(img, frame)
 
-	fmt.Println(gs)
+	placement := chafa.PlacementNew(img, 1)
+	chafa.CanvasSetPlacement(canvas, placement)
+
+	fmt.Println(chafa.CanvasPrint(canvas, nil))
 }
