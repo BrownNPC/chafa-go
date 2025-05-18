@@ -3,8 +3,8 @@ package chafa
 import "unsafe"
 
 var (
-	// Creates a new ChafaFrame containing a copy of the image data pointed to by data.
-	FrameNew func(data unsafe.Pointer, pixelType PixelType, width, height, rowstride int32) *Frame
+	// Creates a new [Frame] containing a copy of the image data pointed to by data.
+	FrameNew func(data []uint8, pixelType PixelType, width, height, rowstride int32) *Frame
 
 	// Creates a new [Frame] embedding the data pointer. It's the caller's
 	// responsibility to ensure the pointer remains valid for the lifetime of
@@ -36,7 +36,7 @@ type Frame struct {
 	PixelType                PixelType
 	Width, Height, Rowstride int32
 
-	Data unsafe.Pointer
+	Data []uint8
 
 	DataIsOwned bool
 }
