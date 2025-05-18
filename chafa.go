@@ -284,6 +284,9 @@ func init() {
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")
 	purego.RegisterLibFunc(&GetNActualThreads, libchafa, "chafa_get_n_actual_threads")
+
+	// Miscellaneous
+	purego.RegisterLibFunc(&CalcCanvasGeometry, libchafa, "chafa_calc_canvas_geometry")
 }
 
 type GString struct {
