@@ -42,11 +42,6 @@ func init() {
 	purego.RegisterLibFunc(&CanvasGetRawColorsAt, libchafa, "chafa_canvas_get_raw_colors_at")
 	purego.RegisterLibFunc(&CanvasSetRawColorsAt, libchafa, "chafa_canvas_set_raw_colors_at")
 
-	// SymbolMap
-	purego.RegisterLibFunc(&SymbolMapNew, libchafa, "chafa_symbol_map_new")
-	purego.RegisterLibFunc(&SymbolMapUnref, libchafa, "chafa_symbol_map_unref")
-	purego.RegisterLibFunc(&SymbolMapAddByTags, libchafa, "chafa_symbol_map_add_by_tags")
-
 	// Config
 	purego.RegisterLibFunc(&CanvasConfigNew, libchafa, "chafa_canvas_config_new")
 	purego.RegisterLibFunc(&CanvasConfigCopy, libchafa, "chafa_canvas_config_copy")
@@ -253,6 +248,29 @@ func init() {
 	purego.RegisterLibFunc(&FrameNewSteal, libchafa, "chafa_frame_new_steal")
 	purego.RegisterLibFunc(&FrameRef, libchafa, "chafa_frame_ref")
 	purego.RegisterLibFunc(&FrameUnref, libchafa, "chafa_frame_unref")
+
+	// SymbolMap
+	purego.RegisterLibFunc(&SymbolMapNew, libchafa, "chafa_symbol_map_new")
+	purego.RegisterLibFunc(&SymbolMapCopy, libchafa, "chafa_symbol_map_copy")
+	purego.RegisterLibFunc(&SymbolMapRef, libchafa, "chafa_symbol_map_ref")
+	purego.RegisterLibFunc(&SymbolMapUnref, libchafa, "chafa_symbol_map_unref")
+	purego.RegisterLibFunc(&SymbolMapAddByTags, libchafa, "chafa_symbol_map_add_by_tags")
+	purego.RegisterLibFunc(&SymbolMapAddByRange, libchafa, "chafa_symbol_map_add_by_range")
+	purego.RegisterLibFunc(&SymbolMapRemoveByTags, libchafa, "chafa_symbol_map_remove_by_tags")
+	purego.RegisterLibFunc(&SymbolMapRemoveByRange, libchafa, "chafa_symbol_map_remove_by_range")
+	purego.RegisterLibFunc(&SymbolMapApplySelectors, libchafa, "chafa_symbol_map_apply_selectors")
+	purego.RegisterLibFunc(
+		&SymbolMapGetAllowBuiltinGlyphs,
+		libchafa,
+		"chafa_symbol_map_get_allow_builtin_glyphs",
+	)
+	purego.RegisterLibFunc(
+		&SymbolMapSetAllowBuiltinGlyphs,
+		libchafa,
+		"chafa_symbol_map_set_allow_builtin_glyphs",
+	)
+	purego.RegisterLibFunc(&SymbolMapGetGlyph, libchafa, "chafa_symbol_map_get_glyph")
+	purego.RegisterLibFunc(&SymbolMapAddGlyph, libchafa, "chafa_symbol_map_add_glyph")
 
 	// Features
 	purego.RegisterLibFunc(&GetNThreads, libchafa, "chafa_get_n_threads")

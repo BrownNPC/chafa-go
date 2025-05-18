@@ -3,9 +3,100 @@ package chafa
 import "unsafe"
 
 var (
-	SymbolMapNew       func() *SymbolMap
+	// Creates a new [SymbolMap] representing a set of Unicode symbols.
+	// The symbol map starts out empty.
+	SymbolMapNew func() *SymbolMap
+
+	// Creates a new [SymbolMap] that's a copy of symbolMap.
+	SymbolMapCopy func(symbolMap *SymbolMap) *SymbolMap
+
+	// Adds a reference to symbolMap.
+	SymbolMapRef func(symbolMap *SymbolMap)
+
+	// Removes a reference from symbolMap. When remaining references drops to
+	// zero, the symbol map is freed and can no longer be used.
+	SymbolMapUnref func(symbolMap *SymbolMap)
+
+	// Adds symbols matching the set of tags to symbolMap.
 	SymbolMapAddByTags func(symbolMap *SymbolMap, tags SymbolTags)
-	SymbolMapUnref     func(symbol_map *SymbolMap)
+
+	// Adds symbols in the code point range starting with first and ending
+	// with last to symbolMap.
+	SymbolMapAddByRange func(symbolMap *SymbolMap, first, last rune)
+
+	// Removes symbols matching the set of tags from symbolMap.
+	SymbolMapRemoveByTags func(symbolMap *SymbolMap, tags SymbolTags)
+
+	// Removes symbols in the code point range starting with first and ending
+	// with last from symbolMap.
+	SymbolMapRemoveByRange func(symbolMap *SymbolMap, first, last rune)
+
+	// Parses a string consisting of symbol tags separated by [+-,] and applies
+	// the pattern to symbolMap . If the string begins with + or -, it's
+	// understood to be relative to the current set in symbolMap, otherwise the
+	// map is cleared first.
+	//
+	// The symbol tags are string versions of [SymbolTags], i.e. [all, none,
+	// space, solid, stipple, block, border, diagonal, dot, quad, half, hhalf,
+	// vhalf, braille, technical, geometric, ascii, extra].
+	//
+	// Examples: "block,border" sets map to contain symbols matching either of
+	// those tags. "+block,border-dot,stipple" adds block and border symbols then
+	// removes dot and stipple symbols.
+	//
+	// If there is a parse error, none of the changes are applied.
+	SymbolMapApplySelectors func(symbolMap *SymbolMap, selectors string) bool
+
+	// Queries whether a symbol map is allowed to use built-in glyphs for symbol
+	// selection. This can be turned off if you want to use your own glyphs
+	// exclusively (see [SymbolMapAddGlyph]).
+	//
+	// Defaults to TRUE.
+	SymbolMapGetAllowBuiltinGlyphs func(symbolMap *SymbolMap) bool
+
+	// Controls whether a symbol map is allowed to use built-in glyphs for symbol
+	// selection. This can be turned off if you want to use your own glyphs
+	// exclusively (see [SymbolMapAddGlyph]).
+	//
+	// Defaults to TRUE.
+	SymbolMapSetAllowBuiltinGlyphs func(symbolMap *SymbolMap, allow bool)
+
+	// Returns data for the glyph corresponding to codePoint stored in symbolMap.
+	// Any of pixelsOut , widthOut , heightOut and rowstrideOut can be nil,
+	// in which case the corresponding data is not retrieved.
+	//
+	// If pixelsOut is not nil, a pointer to freshly allocated memory containing
+	// height * rowstride bytes in the pixel format specified by pixelFormat will
+	// be stored at this address. It must be freed using g_free() when you're
+	// done with it.
+	//
+	// Monochrome glyphs (the only kind currently supported) will be rendered
+	// as opaque white on a transparent black background
+	// (0xffffffff for inked pixels and 0x00000000 for uninked).
+	SymbolMapGetGlyph func(
+		symbolMap *SymbolMap,
+		codePoint rune,
+		pixelFormat PixelType,
+		pixelsOut **byte,
+		widthOut, heightOut, rowstrideOut *int32,
+	) bool
+
+	// Assigns a rendered glyph to a Unicode code point. This tells Chafa what
+	// the glyph looks like so the corresponding symbol can be used appropriately
+	// in output.
+	//
+	// Assigned glyphs override built-in glyphs and any earlier glyph that may
+	// have been assigned to the same code point.
+	//
+	// If the input is in a format with an alpha channel, the alpha channel will
+	// be used for the shape. If not, an average of the color channels will be used.
+	SymbolMapAddGlyph func(
+		symbolMap *SymbolMap,
+		codePoint rune,
+		pixelFormat PixelType,
+		pixels unsafe.Pointer,
+		width, height, rowstride int32,
+	)
 )
 
 type SymbolMap struct {
