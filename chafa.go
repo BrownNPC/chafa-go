@@ -304,6 +304,12 @@ func (gstr *GString) String() string {
 	return gstr.str
 }
 
+type GError struct {
+	Domain  uint32
+	Code    int32
+	Message string
+}
+
 func Load(path string) (pixels []uint8, width, height int32, err error) {
 	file, err := os.Open(path)
 	if err != nil {
