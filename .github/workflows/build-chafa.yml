@@ -1,37 +1,141 @@
-name: Build libchafa
+name: Build Multi-Architecture Binaries
 
 on:
   workflow_dispatch:
+    inputs:
+      chafa_version:
+        description: 'Chafa version to build'
+        required: true
+        default: '1.16'
 
 jobs:
-  release:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64,  386]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install cross-compilation tools
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            autotools-dev \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config \
+            build-essential \
+            libglib2.0-dev
+          
+          case "${{ matrix.arch }}" in
+            amd64)
+              ;;
+            # arm64)
+            #   sudo dpkg --add-architecture armhf
+            #   sudo dpkg --add-architecture arm64
+            #   sudo apt update
+            #   sudo apt install -y gcc-aarch64-linux-gnu libglib2.0-dev:arm64
+            #   ;;
+            386)
+              sudo dpkg --add-architecture i386
+              sudo apt update
+              sudo apt install -y gcc-multilib libc6-dev-i386 libglib2.0-dev:i386
+              ;;
+          esac
+
+      - name: Build Linux ${{ matrix.arch }}
+        run: |
+          case "${{ matrix.arch }}" in
+            amd64)
+              make libs/linux_amd64/libchafa.so
+              ;;
+            # arm64)
+            #   make libs/linux_arm64/libchafa.so
+            #   ;;
+            386)
+              make libs/linux_386/libchafa.so
+              ;;
+          esac
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: libs/linux_${{ matrix.arch }}/
+
+  build-darwin:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        arch: [arm64]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          brew install autoconf automake libtool pkg-config
+
+      - name: Setup GNU tools for autotools
+        run: |
+          # Create symlinks so autotools can find GNU libtool
+          sudo ln -sf $(brew --prefix)/bin/glibtool /usr/local/bin/libtool
+          sudo ln -sf $(brew --prefix)/bin/glibtoolize /usr/local/bin/libtoolize
+          # Add to PATH
+          echo "$(brew --prefix)/bin" >> $GITHUB_PATH
+
+      - name: Build Darwin ${{ matrix.arch }}
+        run: |
+          case "${{ matrix.arch }}" in
+            arm64)
+              make libs/darwin_arm64/libchafa.dylib
+              ;;
+          esac
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: darwin-${{ matrix.arch }}
+          path: libs/darwin_${{ matrix.arch }}/
+
+  combine-and-commit:
+    needs: [build-linux, build-darwin]
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y libglib2.0-dev
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
 
-      - name: Build libchafa
+      - name: Organize binaries
         run: |
-          make clean
-          mkdir -p libs
-          make libs/libchafa-linux-amd64.so
-          sha256sum libs/*.so > CHECKSUMS.txt
+          mkdir -p libs/
+          cp -r artifacts/*/. libs/
+          
+      - name: Generate checksums and build info
+        run: |
+          find libs/ -name "*.so" -o -name "*.dylib" | xargs sha256sum > libs/CHECKSUMS.txt
+          echo "Chafa Version: ${{ github.event.inputs.chafa_version || '1.16' }}" > libs/BUILD_INFO.txt
+          echo "Build Date: $(date)" >> libs/BUILD_INFO.txt
+          echo "Workflow: ${{ github.run_id }}" >> libs/BUILD_INFO.txt
 
       - name: Commit binaries
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add libs/ CHECKSUMS.txt
-          git diff --staged --quiet || git commit -m "Auto-update binaries [skip ci]"
+          git add libs/
+          git diff --staged --quiet || git commit -m "[skip ci] Generate binaries"
           git push
