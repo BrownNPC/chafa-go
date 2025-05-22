@@ -1,49 +1,37 @@
 name: Build libchafa
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install dependencies
         run: |
           sudo apt update
           sudo apt install -y libglib2.0-dev
 
-      # - name: Install dependencies (macOS)
-      #   if: matrix.os == 'macos-latest'
-      #   run: |
-      #     brew install autoconf automake libtool
-
       - name: Build libchafa
         run: |
           make clean
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            make libs/libchafa-linux-amd64.so
-          else
-            make libs/libchafa-darwin-amd64.dylib
-          fi
-
-      - name: Generate checksums
-        run: |
+          mkdir -p libs
+          make libs/libchafa-linux-amd64.so
           sha256sum libs/*.so > CHECKSUMS.txt
 
-      - name: Upload compiled shared library + checksum
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.os }}-libchafa
-          path: |
-            libs/*.so
-            CHECKSUMS.txt
-
+      - name: Commit binaries
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add libs/ CHECKSUMS.txt
+          git diff --staged --quiet || git commit -m "Auto-update binaries [skip ci]"
+          git push
