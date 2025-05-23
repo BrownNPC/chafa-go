@@ -73,7 +73,7 @@ func extractEmbeddedLibrary() (string, error) {
 		}
 
 		// Create platform directory string
-		platformDir = fmt.Sprintf("%s_%s", runtime.GOOS, archSuffix)
+		platformDir = fmt.Sprintf("%s-%s", runtime.GOOS, archSuffix)
 
 		// Create a unique temporary directory for the current user
 		tempDir := filepath.Join(os.TempDir(), fmt.Sprintf("chafa-go-%d", os.Getuid()))
