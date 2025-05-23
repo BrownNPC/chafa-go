@@ -1,3 +1,0 @@
-Chafa Version: 1.16
-Build Date: Fri May 23 18:08:59 UTC 2025
-Workflow: 15216519909

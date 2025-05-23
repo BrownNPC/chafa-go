@@ -123,7 +123,7 @@ jobs:
       - name: Organize binaries
         run: |
           mkdir -p libs/
-          cp -r artifacts/*/. libs/
+          cp -r artifacts/. libs/
           
       - name: Generate checksums and build info
         run: |
