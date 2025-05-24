@@ -980,6 +980,161 @@ var (
 	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
 	// even if the emitted sequence is shorter. The output will not be zero-terminated.
 	TermInfoEmitF12ShiftKey func(termInfo *TermInfo, dest *string) string
+
+	// Terminal emulators and applications are often nested, with the inner
+	// application's capabilities limiting, extending or modifying the outer's.
+	//
+	// Examples are terminal multiplexers like Screen and tmux, or terminal
+	// emulators running inside editors like Emacs and vi.
+	//
+	// This merges the outer and inner sequences into a single [ChafaTermInfo]
+	// according to the following rules.
+	//
+	// For sequences marked as inherited in inner:
+	//
+	//  - If either inner or outer sequence is nil, pick the outer sequence.
+	//  - Otherwise, pick inner sequence.
+	//
+	// For sequences not marked as inherited, always use the inner sequence.
+	//
+	// This allows for using the inner term's sequences while clearing them if
+	// the outer term does not support the sequence at all. This is useful for
+	// muxers (e.g. fbterm supports 256 colors, but with private seqs; we want to
+	// use the inner mux' corresponding seqs).
+	//
+	// The merged [TermInfo] is a new instance, with the initial reference owned
+	// by the caller.
+	//
+	// This function can be used repeatedly to create chains that're arbitrarily long,
+	// but is unlikely to be useful beyond three levels
+	// (terminal emulator, multiplexer, application).
+	TermInfoChain func(outer, inner *TermInfo) *TermInfo
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_CELL_SIZE_PX].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitCellSizePx func(termInfo *TermInfo, dest *string, heightPx, widthPx uint32) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_PRIMARY_DEVICE_ATTRIBUTES].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitPrimaryDeviceAttributes func(termInfo *TermInfo, dest *string, args *uint32, nArgs int32) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_QUERY_CELL_SIZE_PX].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitQueryCellSizePx func(termInfo *TermInfo, dest *string) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_QUERY_PRIMARY_DEVICE_ATTRIBUTES].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitQueryPrimaryDeviceAttributes func(termInfo *TermInfo, dest *string) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_QUERY_TEXT_AREA_SIZE_CELLS].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX bytes],
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitQueryTextAreaSizeCells func(termInfo *TermInfo, dest *string) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_QUERY_TEXT_AREA_SIZE_PX].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitQueryTextAreaSizePx func(termInfo *TermInfo, dest *string) string
+
+	// Behaves like [TermInfoEmitSeq]
+	TermInfoEmitSeqValist func(termInfo *TermInfo, seq TermSeq, args ...any) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_TEXT_AREA_SIZE_CELLS].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX bytes],
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitTextAreaSizeCells func(termInfo *TermInfo, dest *string, heightCells, widthCells uint32) string
+
+	// Prints the control sequence for [CHAFA_TERM_SEQ_TEXT_AREA_SIZE_PX].
+	//
+	// dest must have enough space to hold [CHAFA_TERM_SEQ_LENGTH_MAX] bytes,
+	// even if the emitted sequence is shorter. The output will not be zero-terminated.
+	TermInfoEmitTextAreaSizePx func(termInfo *TermInfo, dest *string, heightPx, widthPx uint32) string
+
+	// Gets the optimal [CanvasMode] supported by termInfo.
+	TermInfoGetBestCanvasMode func(termInfo *TermInfo) CanvasMode
+
+	// Gets the optimal [PixelMode] supported by termInfo.
+	TermInfoGetBestPixelMode func(termInfo *TermInfo) PixelMode
+
+	// Gets whether seq can be inherited from the outer [TermInfo] when chaining
+	// with [TermInfoChain].
+	TermInfoGetInheritSeq func(termInfo *TermInfo, seq TermSeq) bool
+
+	// Gets if passthrough should be used to convey images in pixel_mode.
+	// If needed, the passthrough type can be gotten from [TermInfoGetPassthroughType].
+	TermInfoGetIsPixelPassthroughNeeded func(termInfo *TermInfo, pixelMode PixelMode) bool
+
+	// Gets the name associated with the termInfo. This may be nil. The returned
+	// string belongs to termInfo, and is only valid until the next operation on
+	// this data structure.
+	TermInfoGetName func(termInfo *TermInfo) string
+
+	// Gets the passthrough mode supported by termInfo.
+	TermInfoGetPassthroughType func(termInfo *TermInfo) Passthrough
+
+	// Gets the quirks associated with termInfo.
+	TermInfoGetQuirks func(termInfo *TermInfo) TermQuirks
+
+	// Gets the [SymbolTags] that are likely safe to use with termInfo.
+	// The [SymbolTags] are a bitwise OR of flags from the enum.
+	TermInfoGetSafeSymbolTags func(termInfo *TermInfo) SymbolTags
+
+	// Checks if termInfo has terminal sequences that support canvasMode.
+	TermInfoIsCanvasModeSupported func(termInfo *TermInfo, canvasMode CanvasMode) bool
+
+	// Checks if termInfo has terminal sequences that support pixelMode.
+	TermInfoIsPixelModeSupported func(termInfo *TermInfo, pixelMode PixelMode) bool
+
+	// Attempts to parse a terminal sequence from an input data array. If successful,
+	// [CHAFA_PARSE_SUCCESS] will be returned, the input pointer will be advanced
+	// and the parsed length will be subtracted from inputLen.
+	//
+	// Any numeric parsed arguments are returned as an array starting at argsOut ,
+	// which must have room for up to [CHAFA_TERM_SEQ_ARGS_MAX] elements.
+	//
+	// The number of parsed arguments is returned in nArgsOut. This is useful for
+	// seqs with a variable number of arguments, like
+	// [CHAFA_TERM_SEQ_PRIMARY_DEVICE_ATTRIBUTES].
+	//
+	// Either or both of argsOut and nArgsOut can be NULL, in which case nothing
+	// is returned for that parameter.
+	TermInfoParseSeqVarargs func(
+		term_info *TermInfo,
+		seq TermSeq,
+		input []string,
+		inputLen *int32,
+		argsOut *uint32,
+		nArgsOut *int32,
+	) ParseResult
+
+	// Sets whether seq can be inherited from the outer [TermInfo] when chaining
+	// with [TermInfoChain].
+	TermInfoSetInheritSeq func(termInfo *TermInfo, seq TermSeq, inherit bool)
+
+	// Specifies if passthrough should be used to convey images in pixelMode.
+	TermInfoSetIsPixelPassthroughNeeded func(termInfo *TermInfo, pixelMode PixelMode, pixelPassthroughNeeded bool)
+
+	// Assigns a new name to termInfo. The name should be a short lowercase ASCII
+	// string that uniquely identifies the terminal or program described by termInfo.
+	TermInfoSetName func(termInfo *TermInfo, name string)
+
+	// Assigns a set of quirks to termInfo.
+	TermInfoSetQuirks func(termInfo *TermInfo, quirks TermQuirks)
+
+	// Sets the [SymbolTags] that are likely safe to use with termInfo.
+	// The tags are a bitwise OR of flags from the enum.
+	TermInfoSetSafeSymbolTags func(termInfo *TermInfo, tags SymbolTags)
 )
 
 type TermInfo struct {
@@ -1149,7 +1304,15 @@ const (
 	CHAFA_TERM_SEQ_BEGIN_TMUX_PASSTHROUGH              TermSeq = 143
 	CHAFA_TERM_SEQ_END_TMUX_PASSTHROUGH                TermSeq = 144
 	CHAFA_TERM_SEQ_BEGIN_KITTY_IMMEDIATE_VIRT_IMAGE_V1 TermSeq = 145
-	CHAFA_TERM_SEQ_MAX                                 TermSeq = 146
+	CHAFA_TERM_SEQ_QUERY_PRIMARY_DEVICE_ATTRIBUTES     TermSeq = 146
+	CHAFA_TERM_SEQ_PRIMARY_DEVICE_ATTRIBUTES           TermSeq = 147
+	CHAFA_TERM_SEQ_QUERY_TEXT_AREA_SIZE_CELLS          TermSeq = 148
+	CHAFA_TERM_SEQ_TEXT_AREA_SIZE_CELLS                TermSeq = 149
+	CHAFA_TERM_SEQ_QUERY_TEXT_AREA_SIZE_PX             TermSeq = 150
+	CHAFA_TERM_SEQ_TEXT_AREA_SIZE_PX                   TermSeq = 151
+	CHAFA_TERM_SEQ_QUERY_CELL_SIZE_PX                  TermSeq = 152
+	CHAFA_TERM_SEQ_CELL_SIZE_PX                        TermSeq = 153
+	CHAFA_TERM_SEQ_MAX                                 TermSeq = 154
 )
 
 const CHAFA_TERM_SEQ_LENGTH_MAX = 96
