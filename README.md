@@ -16,8 +16,6 @@ Currently Supported Platforms:
 
 ## Installation
 
-To install `chafa-go`, simply run:
-
 ```bash
 go get github.com/ploMP4/chafa-go
 ```
