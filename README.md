@@ -8,15 +8,11 @@ There are precompiled `libchafa` shared objects embedded in the repository using
 These binaries are automatically built from the official Chafa source and committed via a GitHub Action.  
 At runtime, the correct binary for your platform is selected and loaded dynamically.
 
-> ✅ **You do not need to install `libchafa` manually.**
-
 Currently Supported Platforms:
 
 - linux/amd64
 - linux/386
 - darwin/arm64
-
----
 
 ## Installation
 
@@ -25,8 +21,6 @@ To install `chafa-go`, simply run:
 ```bash
 go get github.com/ploMP4/chafa-go
 ```
-
----
 
 ## Usage
 
@@ -88,13 +82,9 @@ func main() {
 }
 ```
 
----
-
 ## Contributing
 
 All contributions are welcome! If you're planning a significant change or you're unsure about an idea, please open an issue first so we can discuss it in detail.
-
----
 
 ## Acknowledgments
 
