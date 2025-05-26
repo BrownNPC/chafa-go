@@ -1,7 +1,5 @@
 package chafa
 
-import "unsafe"
-
 var (
 	// Creates a new [Frame] containing a copy of the image data pointed to by data.
 	FrameNew func(data []uint8, pixelType PixelType, width, height, rowstride int32) *Frame
@@ -16,12 +14,12 @@ var (
 	// cause unacceptable performance degradation.
 	//
 	// Use [FrameNew] instead.
-	FrameNewBorrow func(data unsafe.Pointer, pixelType PixelType, width, height, rowstride int32) *Frame
+	FrameNewBorrow func(data []uint8, pixelType PixelType, width, height, rowstride int32) *Frame
 
 	// Creates a new [Frame], which takes ownership of the data buffer. The
 	// buffer will be freed with g_free() when the frame's reference count drops
 	// to zero.
-	FrameNewSteal func(data unsafe.Pointer, pixelType PixelType, width, height, rowstride int32) *Frame
+	FrameNewSteal func(data []uint8, pixelType PixelType, width, height, rowstride int32) *Frame
 
 	// Adds a reference to frame.
 	FrameRef func(frame *Frame)
