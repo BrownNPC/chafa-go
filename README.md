@@ -2,6 +2,11 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/ploMP4/chafa-go.svg)](https://pkg.go.dev/github.com/ploMP4/chafa-go)
 
+<div align="center">
+  <img src="showcase.png" alt="slideshow" width=80%>
+</div>
+
+
 **chafa-go** provides Go bindings for the [Chafa](https://hpjansson.org/chafa/) C library using [purego](https://github.com/ebitengine/purego), meaning **no CGO is required**. Chafa is a powerful image-to-text converter for terminal graphics, supporting a variety of character sets, color modes, and dithering options.
 
 There are precompiled `libchafa` shared objects embedded in the repository using Go’s `embed` feature.  
