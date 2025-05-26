@@ -344,7 +344,7 @@ func init() {
 		purego.RegisterLibFunc(&TermDbRef, libchafa, "chafa_term_db_ref")
 		purego.RegisterLibFunc(&TermDbUnref, libchafa, "chafa_term_db_unref")
 		purego.RegisterLibFunc(&TermDbGetDefault, libchafa, "chafa_term_db_get_default")
-		purego.RegisterLibFunc(&TermDbDetect, libchafa, "chafa_term_db_detect")
+		purego.RegisterLibFunc(&termDbDetect, libchafa, "chafa_term_db_detect")
 		purego.RegisterLibFunc(&TermDbGetFallbackInfo, libchafa, "chafa_term_db_get_fallback_info")
 
 		// TermInfo

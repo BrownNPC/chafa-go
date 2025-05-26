@@ -1,5 +1,7 @@
 package chafa
 
+import "unsafe"
+
 var (
 	// Creates a new, blank [TermDb].
 	TermDbNew func() *TermDb
@@ -19,7 +21,7 @@ var (
 
 	// Builds a new [TermInfo] with capabilities implied by the provided
 	// environment variables (principally the TERM variable, but also others).
-	TermDbDetect func(termDb *TermDb, envp **byte) *TermInfo
+	termDbDetect func(termDb *TermDb, envp **byte) *TermInfo
 
 	// Builds a new [TermInfo] with fallback control sequences. This can be used
 	// with unknown but presumably modern terminals, or to supplement missing
@@ -29,6 +31,24 @@ var (
 	// only be used as a last resort.
 	TermDbGetFallbackInfo func(termDb *TermDb) *TermInfo
 )
+
+func TermDbDetect(termDb *TermDb, envp []string) *TermInfo {
+	ptrs := make([]*byte, len(envp))
+	allocated := make([][]byte, len(envp))
+
+	for i, s := range envp {
+		cstr := append([]byte(s), 0)
+		allocated[i] = cstr
+		ptrs[i] = &cstr[0]
+	}
+
+	ptrBlock := make([]uintptr, len(ptrs))
+	for i, p := range ptrs {
+		ptrBlock[i] = uintptr(unsafe.Pointer(p))
+	}
+
+	return termDbDetect(termDb, (**byte)(unsafe.Pointer(&ptrBlock[0])))
+}
 
 type TermDb struct {
 	Refs int32
