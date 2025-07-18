@@ -17,6 +17,7 @@ Currently Supported Platforms:
 - linux/amd64
 - linux/386
 - darwin/arm64
+- windows/amd64
 
 ## Installation
 

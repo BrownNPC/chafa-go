@@ -53,6 +53,8 @@ func extractEmbeddedLibrary() (string, error) {
 			libName = "libchafa.dylib"
 		case "linux":
 			libName = "libchafa.so"
+		case "windows":
+			libName = "libchafa.dll"
 		default:
 			extractErr = fmt.Errorf("unsupported operating system: %s", runtime.GOOS)
 			return

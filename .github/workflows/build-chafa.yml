@@ -9,6 +9,36 @@ on:
         default: '1.16'
 
 jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup MSYS2 & install toolchains
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: >
+            mingw-w64-x86_64-toolchain mingw-w64-x86_64-glib2
+            make autoconf automake libtool pkg-config git
+
+      - name: Build Windows ${{ matrix.arch }}
+        shell: msys2 {0}
+        run: |
+          make libs/windows_amd64/libchafa.dll
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: libs/windows_amd64/
+
   build-linux:
     runs-on: ubuntu-latest
     strategy:
@@ -104,7 +134,7 @@ jobs:
           path: libs/darwin_${{ matrix.arch }}/
 
   combine-and-commit:
-    needs: [build-linux, build-darwin]
+    needs: [build-linux, build-darwin, build-windows]
     runs-on: ubuntu-latest
 
     permissions:
@@ -127,7 +157,7 @@ jobs:
           
       - name: Generate checksums and build info
         run: |
-          find libs/ -name "*.so" -o -name "*.dylib" | xargs sha256sum > libs/CHECKSUMS.txt
+          find libs/ -name "*.so" -o -name "*.dylib" -o -name "*.dll" | xargs sha256sum > libs/CHECKSUMS.txt
           echo "Chafa Version: ${{ github.event.inputs.chafa_version || '1.16' }}" > libs/BUILD_INFO.txt
           echo "Build Date: $(date)" >> libs/BUILD_INFO.txt
           echo "Workflow: ${{ github.run_id }}" >> libs/BUILD_INFO.txt
