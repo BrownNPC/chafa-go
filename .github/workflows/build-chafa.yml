@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [amd64,  386]
+        arch: [amd64, arm64,386]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,12 +64,12 @@ jobs:
           case "${{ matrix.arch }}" in
             amd64)
               ;;
-            # arm64)
-            #   sudo dpkg --add-architecture armhf
-            #   sudo dpkg --add-architecture arm64
-            #   sudo apt update
-            #   sudo apt install -y gcc-aarch64-linux-gnu libglib2.0-dev:arm64
-            #   ;;
+            arm64)
+              sudo dpkg --add-architecture armhf
+              sudo dpkg --add-architecture arm64
+              sudo apt update
+              sudo apt install -y gcc-aarch64-linux-gnu libglib2.0-dev:arm64
+              ;;
             386)
               sudo dpkg --add-architecture i386
               sudo apt update
@@ -83,9 +83,9 @@ jobs:
             amd64)
               make libs/linux_amd64/libchafa.so
               ;;
-            # arm64)
-            #   make libs/linux_arm64/libchafa.so
-            #   ;;
+            arm64)
+              make libs/linux_arm64/libchafa.so
+              ;;
             386)
               make libs/linux_386/libchafa.so
               ;;
